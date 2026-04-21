@@ -30,13 +30,13 @@ A clean and scalable mobile application built with React Native (Expo) to track 
 ##  Screenshots
 
 ### Items Screen
-![Items](assets/screenshots/item.png)
+![Items](assets/screenshots/Item.PNG)
 
 ### Entry Screen
-![Entries](assets/screenshots/entries.png)
+![Entries](assets/screenshots/Entry.PNG)
 
 ### Stats Screen
-![Stats](assets/screenshots/stats.png)
+![Stats](assets/screenshots/Statistics.PNG)
 
 ---
 
