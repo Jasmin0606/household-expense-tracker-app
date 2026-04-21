@@ -27,16 +27,6 @@ A clean and scalable mobile application built with React Native (Expo) to track 
 
 ---
 
-## 📸 Screenshots
-
-> Add screenshots here after running the app
-
-* Items Screen
-* Entry Screen
-* Stats Screen
-
----
-
 ## 📦 Installation
 
 ```bash
