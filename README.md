@@ -30,7 +30,7 @@ A clean and scalable mobile application built with React Native (Expo) to track 
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/household-expense-tracker-app.git
+git clone https://github.com/Jasmin0606/household-expense-tracker-app.git
 cd household-expense-tracker-app
 npm install
 npx expo start
