@@ -7,5 +7,6 @@ export type AppInputProps = {
 export type AppButtonProps = {
   title: string;
   onPress: () => void;
-  
+  disabled?: boolean;
+
 };
