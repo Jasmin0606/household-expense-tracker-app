@@ -3,9 +3,9 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 
 
-export default function AppButton({ title, onPress }: AppButtonProps) {
+export default function AppButton({ title, onPress, disabled }: AppButtonProps) {
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, disabled && { backgroundColor: "#ccc" },]} onPress={onPress} disabled={disabled}>
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );

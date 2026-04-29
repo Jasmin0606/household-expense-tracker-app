@@ -106,8 +106,70 @@ export default function EntryScreen() {
     setQuantity(cleaned);
   };
 
+  const handleQuickAdd = (qty: number) => {
+    if (!value) {
+      alert("Select item first");
+      return;
+    }
+
+    addEntry({
+      id: Date.now().toString() + Math.random(),
+      itemId: value,
+      quantity: qty,
+      date: new Date().toISOString(),
+    });
+  };
+
+  const today = new Date();
+
+  const todayEntries = entries.filter((e) => {
+    const d = new Date(e.date);
+
+    return (
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    );
+  });
+
+
+  const summary: Record<string, { qty: number; cost: number }> = {};
+
+  todayEntries.forEach((e) => {
+    const item = items.find((i) => i.id === e.itemId);
+    const price = item?.pricePerUnit || 0;
+
+    if (!summary[e.itemId]) {
+      summary[e.itemId] = { qty: 0, cost: 0 };
+    }
+
+    summary[e.itemId].qty += e.quantity;
+    summary[e.itemId].cost += e.quantity * price;
+  });
+
+  const totalExpense = Object.values(summary).reduce(
+    (sum, item) => sum + item.cost,
+    0
+  );
+
   return (
     <View style={styles.container}>
+
+
+      {Object.keys(summary).map((itemId) => {
+        const item = items.find((i) => i.id === itemId);
+
+        return (
+          <Text key={itemId}>
+            {item?.name}: {summary[itemId].qty} {item?.unit} → ₹{summary[itemId].cost}
+          </Text>
+        );
+      })}
+
+      <Text style={{ marginTop: 6, fontWeight: "600" }}>
+        Total Expense: ₹{totalExpense}
+      </Text>
+
       <Text style={styles.title}>Add Entry</Text>
 
       <DropDownPicker
@@ -120,6 +182,20 @@ export default function EntryScreen() {
         style={styles.dropdown}
         zIndex={1000}
       />
+
+      <Text style={{ marginBottom: 6, color: value ? "#333" : "#999" }}>
+        {value
+          ? `Selected: ${items.find(i => i.id === value)?.name}`
+          : "Select an item to use quick add"}
+      </Text>
+
+      <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
+        <AppButton title="+1" onPress={() => handleQuickAdd(1)} disabled={!value} />
+        <AppButton title="+0.5" onPress={() => handleQuickAdd(0.5)} disabled={!value} />
+        <AppButton title="+2" onPress={() => handleQuickAdd(2)} disabled={!value} />
+      </View>
+
+
 
       <AppButton
         title={isBulkMode ? "Switch to Single Entry" : "Bulk Entry"}
