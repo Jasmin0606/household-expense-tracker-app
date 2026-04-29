@@ -1,17 +1,16 @@
-import { AppInputProps } from "@/types/components";
-import { StyleSheet, TextInput } from "react-native";
+// import { AppInputProps } from "@/types/components";
+import { StyleSheet, TextInput, TextInputProps } from "react-native";
 
+type AppInputProps = TextInputProps;
 
-
-export default function AppInput({ value, onChangeText, placeholder }: AppInputProps  ) {
+export default function AppInput(props: AppInputProps) {
   return (
     <TextInput
       style={styles.input}
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
       placeholderTextColor="#999"
+      {...props}
     />
+
   );
 }
 

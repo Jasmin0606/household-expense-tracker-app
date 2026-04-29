@@ -21,43 +21,89 @@ export default function EntryScreen() {
   const [value, setValue] = useState<string | null>(null);
   const [quantity, setQuantity] = useState("");
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const dropdownItems = items.map((item) => ({
     label: item.name,
     value: item.id,
   }));
 
-  const handleSave = () => {
-  if (!value || !quantity) return;
+  const getDatesInRange = (start: Date, end: Date) => {
+    const dates = [];
+    const current = new Date(start);
 
-  const baseData = {
-    itemId: value,
-    quantity: Number(quantity),
-    date: date.toISOString(),
+    while (current <= end) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
   };
 
-  if (editingEntry) {
-    updateEntry({
-      id: editingEntry.id,
-      ...baseData,
-    });
-    setEditingEntry(null);
-  } else {
-    addEntry({
-      id: Date.now().toString(),
-      ...baseData,
-    });
-  }
+  const handleSave = () => {
+    if (!value || !quantity) return;
+    if (editingEntry && isBulkMode) {
+      setIsBulkMode(false);
+    }
 
-  setQuantity("");
-  setValue(null);
-};
+    const baseData = {
+      itemId: value,
+      quantity: Number(quantity),
+      date: date.toISOString(),
+    };
+
+    // ✅ EDIT MODE (highest priority)
+    if (editingEntry) {
+      updateEntry({
+        id: editingEntry.id,
+        ...baseData,
+      });
+
+      setEditingEntry(null);
+      return; // ❗ important to stop further execution
+    }
+
+    // ✅ BULK MODE
+    if (isBulkMode) {
+      const dates = getDatesInRange(startDate, endDate);
+
+      dates.forEach((d) => {
+        addEntry({
+          id: Date.now().toString() + Math.random(),
+          itemId: value,
+          quantity: Number(quantity),
+          date: d.toISOString(),
+        });
+      });
+    } else {
+      // ✅ SINGLE ENTRY
+      addEntry({
+        id: Date.now().toString(),
+        ...baseData,
+      });
+    }
+
+    setQuantity("");
+    setValue(null);
+  };
 
   const handleEdit = (entry: Entry) => {
     setEditingEntry(entry);
+
     setValue(entry.itemId);
     setQuantity(String(entry.quantity));
     setDate(new Date(entry.date));
+
+    setIsBulkMode(false); // ✅ important
+
+  };
+
+  const handleQuantityChange = (text: string) => {
+    // allow only numbers + decimal
+    const cleaned = text.replace(/[^0-9.]/g, "");
+    setQuantity(cleaned);
   };
 
   return (
@@ -75,12 +121,29 @@ export default function EntryScreen() {
         zIndex={1000}
       />
 
-      <AppDatePicker date={date} onChange={setDate} />
+      <AppButton
+        title={isBulkMode ? "Switch to Single Entry" : "Bulk Entry"}
+        onPress={() => setIsBulkMode(!isBulkMode)}
+      />
+
+      {isBulkMode ? (
+        <>
+          <Text>Start Date</Text>
+          <AppDatePicker date={startDate} onChange={setStartDate} />
+
+          <Text>End Date</Text>
+          <AppDatePicker date={endDate} onChange={setEndDate} />
+        </>
+      ) : (
+        <AppDatePicker date={date} onChange={setDate} />
+      )}
 
       <AppInput
-        placeholder="Quantity"
+        placeholder="Quantity (liters)"
         value={quantity}
-        onChangeText={setQuantity}
+        keyboardType="decimal-pad"
+        onChangeText={handleQuantityChange}
+        maxLength={5}
       />
 
       <AppButton
@@ -109,7 +172,7 @@ export default function EntryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16,paddingTop:50, backgroundColor: "#f5f5f5" },
+  container: { flex: 1, padding: 16, paddingTop: 50, backgroundColor: "#f5f5f5" },
   title: { fontSize: 20, fontWeight: "600", marginBottom: 10 },
   dropdown: {
     borderColor: "#ddd",
